@@ -26,7 +26,7 @@ app.post('/add', function(req,res){
         conteudo: req.body.conteudo
     })}
     catch(error){
-        res.send("Houve um erro: "+error)
+        res.send("Houve um erro: "+error);
     }   
 })
 
