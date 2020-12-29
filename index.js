@@ -1,8 +1,8 @@
 const express = require("express");
 const app = express();
 const handlebars =require('express-handlebars');
-const bodyParser = require('body-parser')
-const Post = require('./models/Post')
+const bodyParser = require('body-parser');
+const Post = require('./models/Post');
 
 //Config
     //template engine
@@ -11,9 +11,15 @@ const Post = require('./models/Post')
 
     //body Parser
     app.use(bodyParser.urlencoded({extended: false}));
-    app.use(bodyParser.json());
+    app.use(bodyParser.json())
 
 // Rotas
+
+app.get('/', function(req,res){
+    Post.findAll({order: [['id','DESC']]}).then(function(posts){
+        res.render('home', {posts: posts})
+    })
+})
 
 app.get('/cad', function(req,res){
     res.render('formulario')
@@ -21,13 +27,22 @@ app.get('/cad', function(req,res){
 
 app.post('/add', function(req,res){
 
-    try {Post.create({
+    Post.create({
         titulo: req.body.titulo,
         conteudo: req.body.conteudo
-    })}
-    catch(error){
-        res.send("Houve um erro: "+error);
-    }   
+    }).then(function(){
+        res.redirect('/')
+    }).catch(function(erro){
+        res.send("Houve um erro: "+ erro)
+    })
+})
+
+app.get('/deletar/:id', function(req,res){
+    Post.destroy({where:{'id': req.params.id}}).then(function(){
+        res.send("Postagem deletada com sucesso!")
+    }).catch(function(error){
+        res.send("Esta postagem nao existe")
+    })
 })
 
 app.listen(8080,function(){
